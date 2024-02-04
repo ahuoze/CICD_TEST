@@ -8,18 +8,18 @@ pipeline {
     stages {
         stage('clone code') {
             steps {
-                container('maven') {
+                
                     git(url: 'https://github.com/ahuoze/CICD_TEST.git', credentialsId: "$GITHUB_CREDENTIAL_ID", branch: "$BRANCH_NAME", changelog: true, poll: false)
-                }
+                
 
             }
         }
 
         stage('unit test') {
             steps {
-                container('maven') {
+                
                     sh 'mvn clean test'
-                }
+                
 
             }
         }
@@ -29,10 +29,10 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId : "$SONARKUBE_CREDENTIAL_ID" ,variable : 'SONAR_TOKEN' ,)]) {
                     withSonarQubeEnv("$SONARKUBE_SERVER") {
-                        container('maven') {
+                        
                             sh '''mvn sonar:sonar -Dsonar.projectKey=$APP_NAME
 echo "mvn sonar:sonar -Dsonar.projectKey=$APP_NAME"'''
-                        }
+                        
 
                     }
 
@@ -47,13 +47,13 @@ echo "mvn sonar:sonar -Dsonar.projectKey=$APP_NAME"'''
 
         stage('build & push') {
             steps {
-                container('maven') {
+                
                     sh 'mvn clean package -DskipTests'
                     sh 'docker build -f Dockerfile -t $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BUILD_NUMBER .'
                     withCredentials([usernamePassword(credentialsId : "$ALIYUN_PASS" ,passwordVariable : 'DOCKER_PASSWORD' ,usernameVariable : 'DOCKER_USERNAME' ,)]) {
                         sh '''echo "$DOCKER_PASSWORD" | docker login $REGISTRY -u "$DOCKER_USERNAME" --password-stdin
 docker push $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BUILD_NUMBER'''
-                    }
+                    
 
                 }
 
@@ -65,27 +65,27 @@ docker push $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BUILD_NUMBER'''
                 branch 'master'
             }
             steps {
-                container('maven') {
+                
                     sh 'docker tag $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BUILD_NUMBER $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:latest'
                     sh 'docker push $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:latest'
-                }
+                
 
             }
         }
 
         stage('deploy to dev') {
             steps {
-                container('maven') {
+                
                     input(id: 'deploy-to-dev', message: 'deploy to dev?')
                     withCredentials([kubeconfigContent(credentialsId : "$KUBECONFIG_CREDENTIAL_ID" ,variable : 'ADMIN_KUBECONFIG' ,)]) {
-                        sh 'mkdir -p ~/.kube/'
-                        sh 'echo "$ADMIN_KUBECONFIG" > ~/.kube/config'
+//                        sh 'mkdir -p ~/.kube/'
+//                        sh 'echo "$ADMIN_KUBECONFIG" > ~/.kube/config'
                         sh '''sed -i\'\' "s#REGISTRY#$REGISTRY#" deploy/cicd-demo-dev.yaml
 sed -i\'\' "s#DOCKERHUB_NAMESPACE#$DOCKERHUB_NAMESPACE#" deploy/cicd-demo-dev.yaml
 sed -i\'\' "s#APP_NAME#$APP_NAME#" deploy/cicd-demo-dev.yaml
 sed -i\'\' "s#BUILD_NUMBER#$BUILD_NUMBER#" deploy/cicd-demo-dev.yaml
 kubectl apply -f deploy/cicd-demo-dev.yaml'''
-                    }
+                    
 
                 }
 
@@ -109,10 +109,10 @@ kubectl apply -f deploy/cicd-demo-dev.yaml'''
 //                    sh 'git push http://$GIT_USERNAME:$GIT_PASSWORD@$GIT_REPO_URL/$GIT_ACCOUNT/k8s-cicd-demo.git --tags --ipv4'
 //                }
 
-                container('maven') {
+                
                     sh 'docker tag $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BUILD_NUMBER $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:$TAG_NAME'
                     sh 'docker push $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:$TAG_NAME'
-                }
+                
 
             }
         }
@@ -127,14 +127,14 @@ kubectl apply -f deploy/cicd-demo-dev.yaml'''
             }
             steps {
                 input(message: 'deploy to production?', submitter: '')
-                container('maven') {
+                
                     sh '''sed -i\'\' "s#REGISTRY#$REGISTRY#" deploy/cicd-demo.yaml
 sed -i\'\' "s#DOCKERHUB_NAMESPACE#$DOCKERHUB_NAMESPACE#" deploy/cicd-demo.yaml
 sed -i\'\' "s#APP_NAME#$APP_NAME#" deploy/cicd-demo.yaml
 sed -i\'\' "s#TAG_NAME#$TAG_NAME#" deploy/cicd-demo.yaml
 
 kubectl apply -f deploy/cicd-demo.yaml'''
-                }
+                
 
             }
         }
