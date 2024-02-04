@@ -35,7 +35,7 @@ spec:
           image: REGISTRY/DOCKERHUB_NAMESPACE/APP_NAME:SNAPSHOT-BUILD_NUMBER
           readinessProbe:
             httpGet:
-              path: /users
+              path: /to_login
               port: 8080
             timeoutSeconds: 10
             failureThreshold: 30
