@@ -29,7 +29,7 @@ spec:
         tier: backend
     spec:
       imagePullSecrets:
-        - name: harbor-secret
+        - name: aliyun-secret
       containers:
         - name: k8s-cicd-demo
           image: REGISTRY/DOCKERHUB_NAMESPACE/APP_NAME:SNAPSHOT-BUILD_NUMBER

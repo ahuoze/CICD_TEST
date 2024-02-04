@@ -87,7 +87,6 @@ kubectl apply -f deploy/cicd-demo-dev.yaml'''
         }
 
         stage('push with tag') {
-            agent none
             when {
                 expression {
                     params.TAG_NAME =~ /v.*/
@@ -112,7 +111,6 @@ kubectl apply -f deploy/cicd-demo-dev.yaml'''
         }
 
         stage('deploy to production') {
-            agent none
             when {
                 expression {
                     params.TAG_NAME =~ /v.*/
