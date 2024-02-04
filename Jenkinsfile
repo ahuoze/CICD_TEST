@@ -75,7 +75,6 @@ docker push $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BUILD_NUMBER'''
             steps {
                 
                     input(id: 'deploy-to-dev', message: 'deploy to dev?')
-                    withCredentials([kubeconfigContent(credentialsId : "$KUBECONFIG_CREDENTIAL_ID" ,variable : 'ADMIN_KUBECONFIG' ,)]) {
 //                        sh 'mkdir -p ~/.kube/'
 //                        sh 'echo "$ADMIN_KUBECONFIG" > ~/.kube/config'
                         sh '''sed -i\'\' "s#REGISTRY#$REGISTRY#" deploy/cicd-demo-dev.yaml
@@ -83,9 +82,6 @@ sed -i\'\' "s#DOCKERHUB_NAMESPACE#$DOCKERHUB_NAMESPACE#" deploy/cicd-demo-dev.ya
 sed -i\'\' "s#APP_NAME#$APP_NAME#" deploy/cicd-demo-dev.yaml
 sed -i\'\' "s#BUILD_NUMBER#$BUILD_NUMBER#" deploy/cicd-demo-dev.yaml
 kubectl apply -f deploy/cicd-demo-dev.yaml'''
-                    
-
-                }
 
             }
         }
