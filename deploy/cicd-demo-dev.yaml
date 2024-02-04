@@ -32,7 +32,7 @@ spec:
         - name: aliyun-secret
       containers:
         - name: k8s-cicd-demo
-          image: REGISTRY/DOCKERHUB_NAMESPACE/APP_NAME:SNAPSHOT-BUILD_NUMBER
+          image: REGISTRY/DOCKERHUB_NAMESPACE/APP_NAME:SNAPSHOT-TAG_NAME
           readinessProbe:
             httpGet:
               path: /login/to_login
