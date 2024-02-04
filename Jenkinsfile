@@ -25,13 +25,11 @@ pipeline {
         }
 
         stage('sonarqube analysis') {
-            agent none
             steps {
                 withCredentials([string(credentialsId : "$SONARKUBE_CREDENTIAL_ID" ,variable : 'SONAR_TOKEN' ,)]) {
                     withSonarQubeEnv("$SONARKUBE_SERVER") {
                         
-                            sh '''mvn sonar:sonar -Dsonar.projectKey=$APP_NAME
-echo "mvn sonar:sonar -Dsonar.projectKey=$APP_NAME"'''
+                            sh '''mvn sonar:sonar -Dsonar.projectKey=$APP_NAME'''
                         
 
                     }
@@ -145,7 +143,7 @@ kubectl apply -f deploy/cicd-demo.yaml'''
 //        GIT_REPO_URL = '192.168.113.121:28080'
 //        GIT_CREDENTIAL_ID = 'gitlab-user-pass'
         KUBECONFIG_CREDENTIAL_ID = '0d0cf0ae-313b-4cb0-bea4-1b6f48b752f8'
-        SONARKUBE_CREDENTIAL_ID = 'sonarcube-token'
+        SONARKUBE_CREDENTIAL_ID = 'sonarqube-token'
         SONARKUBE_SERVER = 'sonarqube'
         ALIYUN_CREDENTIAL_ID = 'aliyun-token'
         ALIYUN_PASS = 'aliyun-token'
